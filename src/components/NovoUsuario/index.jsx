@@ -22,22 +22,43 @@ class NovoUsuario extends React.Component {
         return (
             <div className="center">
                 <form className="pure-form pure-form-stacked">
-                    <Label 
-                        htmlFor="nome" 
-                        texto="Quem é você?"
-                        valorInvalido={this.state.validacao.nomeInvalido}
-                     />
-                    <Input
-                        id="nome"
-                        placeholder="Digite seu nome"
-                        maxLength="40"
-                        readOnly={false}
-                        valorInvalido={this.state.validacao.nomeInvalido}
-                        defaultValue={this.state.usuario.nome}
-                        onChange={this.atualizarNome.bind(this)}
-                    />
+                    {this.renderizarNome()}
+                    {this.renderizarGenero()}
+                    {this.renderizarBotoes()}
+                </form>
+            </div>
+        );
+    }
+
+    renderizarNome() {
+        return (
+            <section>
+                <Label 
+                    htmlFor="nome" 
+                    texto={this.state.primeiraVisaoCompleta ? "Welcome!" : "Who are you?"}
+                    valorInvalido={this.state.validacao.nomeInvalido}
+                />
+                <Input
+                    id="nome"
+                    placeholder="Type your name"
+                    maxLength="40"
+                    readOnly={this.state.primeiraVisaoCompleta}
+                    valorInvalido={this.state.validacao.nomeInvalido}
+                    defaultValue={this.state.usuario.nome}
+                    onChange={this.atualizarNome.bind(this)}
+                />
+            </section>
+        )
+    }
+
+    renderizarGenero() {
+        if (this.state.primeiraVisaoCompleta) {
+            return null
+        } else {
+            return (
+                <section>
                     <Label
-                        texto="Seu gênero:"
+                        texto="Your gender:"
                         valorInvalido={this.state.validacao.generoInvalido}
                     />
                     <GenderSelector
@@ -45,14 +66,41 @@ class NovoUsuario extends React.Component {
                         genero={this.state.usuario.genero}
                         atualizarGenero={this.atualizarGenero.bind(this)}
                     />
+                </section>
+            )
+        }
+    }
+
+    renderizarBotoes() {
+        if (this.state.primeiraVisaoCompleta) {
+            return (
+                <section>
+                    <Button
+                        texto="Go back"
+                        onClick={e => { 
+                            e.preventDefault();
+                            this.setState({
+                                primeiraVisaoCompleta: false
+                            });
+                        }}
+                    />
                     <Button
                         principal
-                        texto="Próximo"
+                        texto="Save"
+                    />
+                </section>
+            )
+        } else {
+            return (
+                <section>
+                    <Button
+                        principal
+                        texto="Next"
                         onClick={this.validar.bind(this)}
                     />
-                </form>
-            </div>
-        );
+                </section>
+            )
+        }
     }
 
     atualizarNome(e) {
@@ -64,7 +112,7 @@ class NovoUsuario extends React.Component {
     }
 
     atualizarGenero(e, genero) {
-        e.preventDefault();
+        //e.preventDefault();
         let usuario = this.state.usuario;
         usuario.genero = genero;
         this.setState({
@@ -73,7 +121,7 @@ class NovoUsuario extends React.Component {
     }
 
     validar(e) {
-        e.preventDefault;
+        //e.preventDefault;
         let usuario = this.state.usuario;
         let validacao = this.state.validacao;
         validacao.nomeInvalido = !usuario.validarNome();
@@ -81,11 +129,11 @@ class NovoUsuario extends React.Component {
         let mensagem = '';
         let primeiraVisaoCompleta = false;
         if (validacao.nomeInvalido && validacao.generoInvalido) {
-            mensagem = 'Os campos nome e gênero estão inválidos!'
+            mensagem = 'The fields name and gender are invalids!'
         } else if (validacao.nomeInvalido) {
-            mensagem = 'Seu nome está inválido!'
+            mensagem = 'Your name are invalid!'
         } else if (validacao.generoInvalido) {
-            mensagem = 'Selecione seu gênero!'
+            mensagem = 'Your gender are invalid!'
         } else {
             primeiraVisaoCompleta = true;
         }
